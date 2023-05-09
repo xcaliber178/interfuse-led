@@ -1,10 +1,17 @@
-NUM_PIXELS = 18
-DELAY = 0.08
-brightness = 1.0
+# Imports
+from machine import Pin, freq
+from neopixel import NeoPixel
 
-RED = (92, 0, 0)
-BLUE = (0, 92, 0)
-GREEN = (0, 0, 92)
-PURPLE = (170, 255, 0)
-PINK = (255, 185, 0)
-ORANGE = (255, 0, 165)
+# Set clock speed
+freq(240000000)
+
+# Neopixel setup
+PIN=6
+NUM_PIXELS = 18
+np1 = Pin(PIN, Pin.OUT)
+neo1 = NeoPixel(np1, NUM_PIXELS)
+
+# User input setup
+pinBTN01=18
+btn01 = Pin(pinBTN01, Pin.IN, Pin.PULL_UP)
+DEBOUNCE_MS = 50

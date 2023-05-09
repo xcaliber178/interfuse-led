@@ -1,61 +1,39 @@
-from machine import Pin, freq
-from neopixel import NeoPixel
+# Imports
+from machine import Timer
 from time import sleep
 from setup import *
-
-freq(240000000)
-
-PIN=6
-np1 = Pin(PIN, Pin.OUT)
-neo1 = NeoPixel(np1, NUM_PIXELS)
-BTN=18
+from colors import *
 from effects import *
 
-def set_brightness(pot):
-    global brightness
-    brightness = pot / 65535.0
-    
-    brightness = min(1.0, max(0.0, brightness))
 
-#BUTTON TEST
-interrupt_flag=0
-pin = Pin(BTN,Pin.IN,Pin.PULL_UP)
+cycle = -1
+def cycle_effect():
+    global cycle
+    cycle += 1
+    effect()
 
-def test():
-    chase(neo1, RED)
-    chase_backward(neo1, RED)
-    interrupt_flag=0
+def button01(pin):
+    tim = Timer(-1)
+    tim.init(period=DEBOUNCE_MS, mode=Timer.ONE_SHOT, callback=lambda t: None)
+    state = pin.value()
+    if state == 0:
+        cycle_effect()
 
-def callback(pin):
-    global interrupt_flag
-    interrupt_flag=1
-    test()
+btn01.irq(trigger=Pin.IRQ_FALLING, handler=button01)
 
-pin.irq(trigger=Pin.IRQ_FALLING, handler=callback)
-
-while (True):
-    while (True):
-        set_brightness(60000)
-        print(brightness)
-        
-        rainbow(neo1, 0.03)
-        
-        set_brightness(40000)
-        print(brightness)
-        
-        rainbow_move(neo1, 0.03)
-        
-        set_brightness(20000)
-        print(brightness)
-        
-        rainbow(neo1, 0.03)
-        
-        set_brightness(10000)
-        print(brightness)
-        
-        rainbow_move(neo1, 0.03)
-        
-        set_brightness(5000)
-        print(brightness)
-        
-        rainbow(neo1, 0.03)
+def effect():
+    global cycle
+    if cycle == 0:
+        rainbow(neo1)
+    elif cycle == 1:
+        chase(neo1, RED)
+    elif cycle == 2:
+        chase_backward(neo1, BLUE)
+    elif cycle == 3:
+        color_wipe_backward(neo1, GREEN)
+    elif cycle == 4:
+        color_wipe(neo1, YELLOW)
+    elif cycle == 5:
+        rainbow_move(neo1, 0.02)
+    elif cycle == 6:
+        breath(neo1, BLUE)
